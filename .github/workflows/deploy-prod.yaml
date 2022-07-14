@@ -1,0 +1,14 @@
+name: deploy-prod
+
+on:
+  push:
+    branches:
+      - deploy
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy
+        run: |
+          echo '(fake) deploy is done!'
