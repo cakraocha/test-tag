@@ -117,7 +117,7 @@ else
     # only tag if no tag already
     if [ -z "$NEEDS_TAG" ]; then
       echo "Tagged with $NEW_TAG"
-      git tag -a $NEW_TAG -m $VERSION_MSG
+      git tag -a $NEW_TAG -m "${VERSION_MSG}"
       git push origin tag $NEW_TAG
     else
       echo "Tag already exists with this commit. Using existing tag.."
