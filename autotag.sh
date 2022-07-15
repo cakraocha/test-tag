@@ -74,16 +74,30 @@ else
     exit 1
   else
     echo "Current Version: $CURRENT_VERSION"
-    CURRENT_VERSION_PARTS=(${CURRENT_VERSION//./ })
+    
+    # break the current version into each major.minor.patch 
+    delimiter="."
+    string=$CURRENT_VERSION$delimiter
+    CURRENT_VERSION_PARTS=()
+
+    while [[ $string ]]; do
+      CURRENT_VERSION_PARTS+=( "${string%%"$delimiter"*}" )
+      string=${string#*"$delimiter"}
+    done
+
+    echo ${CURRENT_VERSION_PARTS[0]}
+    echo ${CURRENT_VERSION_PARTS[1]}
+    echo ${CURRENT_VERSION_PARTS[2]}
 
     # get number parts
     VNUM1=${CURRENT_VERSION_PARTS[0]}
+    VNUM1=${VNUM1:1:1}
     VNUM2=${CURRENT_VERSION_PARTS[1]}
     VNUM3=${CURRENT_VERSION_PARTS[2]}
 
     if [[ $VERSION == 'major' ]]
     then
-      VNUM1=v$((VNUM1+1))
+      VNUM1=$((VNUM1+1))
     elif [[ $VERSION == 'minor' ]]
     then
       VNUM2=$((VNUM2+1))
