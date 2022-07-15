@@ -17,7 +17,7 @@ jobs:
           echo '(fake) deploy is done!'
 
       - name: Automatic Tagging of Releases
-        id: increment-git-tag
+        id: auto-tag
         env:
           GITHUB_TOKEN: ${{ secrets.TAG_GITHUB_TOKEN }}
         run: |
@@ -26,6 +26,6 @@ jobs:
       - name: Build, Tag, and Push the Image to Amazon ECR
         id: build-image
         env:
-          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+          IMAGE_TAG: ${{ steps.auto-tag.outputs.git-tag }}
         run: |
-          echo 'Pushing version $IMAGE_TAG'
+          echo 'Pushing version' $IMAGE_TAG
