@@ -20,11 +20,13 @@ function chsv_check_version_ex() {
   fi
 }
 
+MERGE_COMMIT=`git log --oneline -n 1`
+
 # format of the merge commit have to have the ':'
 # e.g. '32890d0 Merge pull request #6 from oscerai/dev v1.0.1: test to increment minor'
-if [[ $str == *[':']* ]]
+if [[ $MERGE_COMMIT == *[':']* ]]
 then
-  VERSION=`cut -d ":" -f1 <<< "$VERSION"`
+  VERSION=`cut -d ":" -f1 <<< "$MERGE_COMMIT"`
   VERSION=$(echo "${VERSION##* }")
 # if no ':', then the format is incorrect
 # we just see whether the current commit already has a tag in it
@@ -45,7 +47,7 @@ fi
 
 # check the version whether it is in accordance to semver
 # if yes, we use that tag
-check=`chsv_check_version_ex $str`
+check=`chsv_check_version_ex $VERSION`
 if [ "$check" ]; then
   VERSION="v${check}"
   echo "Using tag from commit ${VERSION}"
