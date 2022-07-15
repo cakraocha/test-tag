@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# credentials for tagging and committing
+git config user.name "GitHub Actions Bot"
+git config user.email "<>"
+
 # function to check whether the version is in accordance to semver
 # e.g. 1.0.1
 function chsv_check_version() {
