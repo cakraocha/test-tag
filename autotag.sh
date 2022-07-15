@@ -32,6 +32,8 @@ if [[ $MERGE_COMMIT == *[':']* ]]
 then
   VERSION=`cut -d ":" -f1 <<< "$MERGE_COMMIT"`
   VERSION=$(echo "${VERSION##* }")
+  
+  VERSION_MSG=`cut -d ":" -f2 <<< "$MERGE_COMMIT"`
 # if no ':', then the format is incorrect
 # we just see whether the current commit already has a tag in it
 # if no tag attach, then return 1 due to wrong format and no tag attached
@@ -58,7 +60,7 @@ if [ "$check" ]; then
 
   VERSION="v${check}"
   echo "Using tag from commit ${VERSION}"
-  git tag $VERSION
+  git tag -a $VERSION -m $VERSION_MSG
   git push origin tag $VERSION
   echo ::set-output name=git-tag::$VERSION
   exit 0
@@ -115,7 +117,7 @@ else
     # only tag if no tag already
     if [ -z "$NEEDS_TAG" ]; then
       echo "Tagged with $NEW_TAG"
-      git tag $NEW_TAG
+      git tag -a $NEW_TAG -m $VERSION_MSG
       git push origin tag $NEW_TAG
     else
       echo "Tag already exists with this commit. Using existing tag.."
