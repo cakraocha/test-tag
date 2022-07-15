@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - deploy
+
+permissions: write-all
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,10 +20,10 @@ jobs:
         id: increment-git-tag
         run: |
           bash ./autotag.sh
-      
+
       - name: Build, Tag, and Push the Image to Amazon ECR
         id: build-image
         env:
           IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
         run: |
-          echo 'Pushing version ${IMAGE_TAG}'
+          echo 'Pushing version $IMAGE_TAG'
