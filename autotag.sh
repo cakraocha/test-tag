@@ -22,6 +22,10 @@ function chsv_check_version_ex() {
 
 MERGE_COMMIT=`git log --oneline -n 1`
 
+# get current hash and see if it already has a tag
+GIT_COMMIT=`git rev-parse HEAD`
+NEEDS_TAG=`git describe --contains $GIT_COMMIT 2>/dev/null`
+
 # format of the merge commit have to have the ':'
 # e.g. '32890d0 Merge pull request #6 from oscerai/dev v1.0.1: test to increment minor'
 if [[ $MERGE_COMMIT == *[':']* ]]
@@ -32,9 +36,6 @@ then
 # we just see whether the current commit already has a tag in it
 # if no tag attach, then return 1 due to wrong format and no tag attached
 else
-  GIT_COMMIT=`git rev-parse HEAD`
-  NEEDS_TAG=`git describe --contains $GIT_COMMIT 2>/dev/null`
-
   if [ "$NEEDS_TAG" ]; then
     echo "Tag already exists with this commit. Using existing tag.."
     echo ::set-output name=git-tag::$NEW_TAG
@@ -49,6 +50,12 @@ fi
 # if yes, we use that tag
 check=`chsv_check_version_ex $VERSION`
 if [ "$check" ]; then
+  if [ "$NEEDS_TAG" ]; then
+    echo "Tag already exists with this commit. Using existing tag.."
+    echo ::set-output name=git-tag::$NEW_TAG
+    exit 0
+  fi
+
   VERSION="v${check}"
   echo "Using tag from commit ${VERSION}"
   git tag $VERSION
@@ -90,10 +97,6 @@ else
 
     NEW_TAG="v$VNUM1.$VNUM2.$VNUM3"
     echo "($VERSION) updating $CURRENT_VERSION to $NEW_TAG"
-
-    # get current hash and see if it already has a tag
-    GIT_COMMIT=`git rev-parse HEAD`
-    NEEDS_TAG=`git describe --contains $GIT_COMMIT 2>/dev/null`
 
     # only tag if no tag already
     if [ -z "$NEEDS_TAG" ]; then
