@@ -44,7 +44,8 @@ then
 else
   if [ "$NEEDS_TAG" ]; then
     echo "Tag already exists with this commit. Using existing tag.."
-    echo ::set-output name=git-tag::$NEW_TAG
+    CURRENT_TAG=`cut -d "^" -f1 <<< "$NEEDS_TAG"`
+    echo ::set-output name=git-tag::$CURRENT_TAG
     exit 0
   else
     echo "Wrong commit format and no tag found."
@@ -58,19 +59,26 @@ check=`chsv_check_version_ex $VERSION`
 if [ "$check" ]; then
   if [ "$NEEDS_TAG" ]; then
     echo "Tag already exists with this commit. Using existing tag.."
-    echo ::set-output name=git-tag::$NEW_TAG
+    CURRENT_TAG=`cut -d "^" -f1 <<< "$NEEDS_TAG"`
+    echo ::set-output name=git-tag::$CURRENT_TAG
     exit 0
   fi
 
   VERSION="v${check}"
-  echo "Using tag from commit ${VERSION}"
-  git tag -a $VERSION -m $VERSION_MSG
-  git push origin tag $VERSION
-  echo ::set-output name=git-tag::$VERSION
-  exit 0
+  if [ $(git tag -l "$version") ]; then
+    echo "Tag ${VERSION} already exists. Please retag with the new version."
+    exit 1
+  else
+    echo "Using tag from commit ${VERSION}"
+    git tag -a $VERSION -m "${VERSION_MSG}"
+    git push origin tag $VERSION
+    echo ::set-output name=git-tag::$VERSION
+    exit 0
+  fi
 # else, it must be a major, minor, or patch increment
 else
-  # get highest tag number, and add v0.1.0 if doesn't exist
+  # get highest tag number
+  # if there is no tag, exit 1 which the user must create a tag first whether it is via merge commit or manually
   git fetch --prune --unshallow 2>/dev/null
   CURRENT_VERSION=`git describe --abbrev=0 --tags 2>/dev/null`
 
@@ -80,7 +88,14 @@ else
     exit 1
   else
     echo "Current Version: $CURRENT_VERSION"
-    
+  
+    if [ "$NEEDS_TAG" ]; then
+      echo "Tag already exists with this commit. Using existing tag.."
+      CURRENT_TAG=`cut -d "^" -f1 <<< "$NEEDS_TAG"`
+      echo ::set-output name=git-tag::$CURRENT_TAG
+      exit 0
+    fi
+
     # break the current version into each major.minor.patch 
     delimiter="."
     string=$CURRENT_VERSION$delimiter
@@ -101,12 +116,21 @@ else
     VNUM2=${CURRENT_VERSION_PARTS[1]}
     VNUM3=${CURRENT_VERSION_PARTS[2]}
 
+    # if there is a pre-release version on major, minor, or patch update
+    # we only take the number for patch update
+    if [[ $VNUM3 =~ ["-"] ]]; then
+      VNUM3=`cut -d "-" -f1 <<< "$VNUM3"`
+    fi
+
     if [[ $VERSION == 'major' ]]
     then
       VNUM1=$((VNUM1+1))
+      VNUM2=0
+      VNUM3=0
     elif [[ $VERSION == 'minor' ]]
     then
       VNUM2=$((VNUM2+1))
+      VNUM3=0
     elif [[ $VERSION == 'patch' ]]
     then
       VNUM3=$((VNUM3+1))
@@ -116,20 +140,17 @@ else
     fi
 
     NEW_TAG="v$VNUM1.$VNUM2.$VNUM3"
-    echo "($VERSION) updating $CURRENT_VERSION to $NEW_TAG"
-
-    # only tag if no tag already
-    if [ -z "$NEEDS_TAG" ]; then
-      echo "Tagged with $NEW_TAG"
-      git tag -a $NEW_TAG -m "${VERSION_MSG}"
-      git push origin tag $NEW_TAG
+    if [ $(git tag -l "$NEW_TAG") ]; then
+      echo "Tag ${NEW_TAG} already exists. Please retag with the new version."
+      exit 1
     else
-      echo "Tag already exists with this commit. Using existing tag.."
-      CURRENT_TAG=`cut -d ":" -f1 <<< "$NEEDS_TAG"`
-      echo ::set-output name=git-tag::$CURRENT_TAG
-      exit 0
+      echo "($VERSION) updating $CURRENT_VERSION to $NEW_TAG"
+
+      git tag -a $NEW_TAG -m "${VERSION_MSG}"
+      echo "Tagged with $NEW_TAG"
+      git push origin tag $NEW_TAG
+      echo ::set-output name=git-tag::$NEW_TAG
     fi
-    echo ::set-output name=git-tag::$NEW_TAG
   fi
 fi
 
