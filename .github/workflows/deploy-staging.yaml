@@ -18,5 +18,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Deploy
         run: |
+          echo 'deploying...'
+          sleep 5m
           echo '(fake) deploy staging is done!'
 

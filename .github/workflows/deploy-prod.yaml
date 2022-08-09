@@ -36,3 +36,5 @@ jobs:
           IMAGE_TAG: ${{ steps.auto-tag.outputs.git-tag }}
         run: |
           echo 'Pushing version' $IMAGE_TAG
+          sleep 3m
+          echo 'Image pushed!'
