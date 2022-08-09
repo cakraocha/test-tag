@@ -1,6 +1,10 @@
 name: deploy-prod
 
 on:
+  workflow_run:
+    workflows: [deploy-dev, deploy-staging]
+    types:
+      - completed
   push:
     branches:
       - deploy
@@ -11,7 +15,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Deploy
         run: |
           echo '(fake) deploy is done!'
