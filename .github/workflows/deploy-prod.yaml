@@ -1,10 +1,10 @@
 name: deploy-prod
 
 on:
-  workflow_run:
-    workflows: [deploy-dev, deploy-staging]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: [deploy-dev, deploy-staging]
+  #   types:
+  #     - completed
   push:
     branches:
       - deploy

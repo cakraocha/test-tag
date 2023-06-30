@@ -1,10 +1,10 @@
 name: deploy-staging
 
 on:
-  workflow_run:
-    workflows: [deploy-dev]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: [deploy-dev]
+  #   types:
+  #     - completed
   push:
     branches:
       - staging
@@ -19,6 +19,6 @@ jobs:
       - name: Deploy
         run: |
           echo 'deploying...'
-          sleep 5m
+          sleep 5
           echo '(fake) deploy staging is done!'
 
