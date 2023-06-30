@@ -4,8 +4,20 @@ on:
   push:
     branches:
       - main
-
-permissions: write-all
+  workflow_dispatch:
+    permissions:
+      users:
+        - github-actions
+    inputs:
+      tag:
+        description: 'Tag to deploy'
+        required: true
+        type: string
+        default: 'latest'
+      container_update:
+        description: 'Update container image'
+        required: true
+        type: boolean
 
 jobs:
   deploy:
