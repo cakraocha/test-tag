@@ -8,7 +8,6 @@ on:
     permissions:
       users:
         - github-actions
-        - cakraocha
     inputs:
       tag:
         description: 'Tag to deploy'
