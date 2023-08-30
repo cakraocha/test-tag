@@ -3,8 +3,8 @@ name: Manual Workflow
 on:
   workflow_dispatch:
     inputs:
-      commit_sha:
-        description: 'SHA of the commit to run the workflow on'
+      tag_name:
+        description: 'Name of the tag to re-deploy'
         required: true
 
 jobs:
@@ -14,9 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.commit_sha }}
+          ref: ${{ github.event.inputs.tag_name }}
       # Add more steps here to run your workflow on the specific commit
 
       - name: Run Workflow
         run: |
-          echo "Running workflow on commit ${{ github.event.inputs.commit_sha }}"
+          cat .github/workflows/deploy-dev-manual.yaml
