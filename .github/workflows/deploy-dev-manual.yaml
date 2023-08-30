@@ -19,4 +19,4 @@ jobs:
 
       - name: Run Workflow
         run: |
-          cat .github/workflows/deploy-dev-manual.yaml
+          cat .github/workflows/deploy-dev.yaml
