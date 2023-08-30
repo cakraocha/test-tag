@@ -1,40 +1,22 @@
-name: deploy-dev-manual
+name: Manual Workflow
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Tag to deploy'
+      commit_sha:
+        description: 'SHA of the commit to run the workflow on'
         required: true
-        type: string
-        default: 'latest'
-      container_update:
-        description: 'Update container image'
-        required: true
-        type: boolean
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if not main branch
-        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
-        run: |
-          echo "Error: You can only deploy from main branch"
-          exit 1
-      
-      - name: Fail if not authorised user
-        if: github.event_name == 'workflow_dispatch' && !contains('["ocha-heidi"]', github.actor)
-        run: |
-          echo "Error: You are not authorised to deploy"
-          exit 1
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.commit_sha }}
+      # Add more steps here to run your workflow on the specific commit
 
-      - uses: actions/checkout@v3
-      - name: Deploy
+      - name: Run Workflow
         run: |
-          echo 'deploying...'
-          sleep 5
-          echo '(fake) manual deploy is done!'
+          echo "Running workflow on commit ${{ github.event.inputs.commit_sha }}"

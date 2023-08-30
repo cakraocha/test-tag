@@ -1,40 +1,40 @@
-name: deploy-prod
+# name: deploy-prod
 
-on:
-  # workflow_run:
-  #   workflows: [deploy-dev, deploy-staging]
-  #   types:
-  #     - completed
-  push:
-    branches:
-      - deploy
+# on:
+#   # workflow_run:
+#   #   workflows: [deploy-dev, deploy-staging]
+#   #   types:
+#   #     - completed
+#   push:
+#     branches:
+#       - deploy
 
-permissions: write-all
+# permissions: write-all
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
 
-      - name: Deploy
-        run: |
-          echo '(fake) deploy is done!'
+#       - name: Deploy
+#         run: |
+#           echo '(fake) deploy is done!'
 
-      - name: Automatic Tagging of Releases
-        id: auto-tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.TAG_GITHUB_TOKEN }}
-        run: |
-          bash ./autotag.sh
+#       - name: Automatic Tagging of Releases
+#         id: auto-tag
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.TAG_GITHUB_TOKEN }}
+#         run: |
+#           bash ./autotag.sh
 
-      - name: Build, Tag, and Push the Image to Amazon ECR
-        id: build-image
-        env:
-          IMAGE_TAG: ${{ steps.auto-tag.outputs.git-tag }}
-        run: |
-          echo 'Pushing version' $IMAGE_TAG
-          sleep 3m
-          echo 'Image pushed!'
+#       - name: Build, Tag, and Push the Image to Amazon ECR
+#         id: build-image
+#         env:
+#           IMAGE_TAG: ${{ steps.auto-tag.outputs.git-tag }}
+#         run: |
+#           echo 'Pushing version' $IMAGE_TAG
+#           sleep 3m
+#           echo 'Image pushed!'
